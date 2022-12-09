@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: MyDemo
+  jackson:
+    serialization:
+      # permette indentazione del Json su Chrome
+      indent-output: true
+
+server:
+  port: 8084
