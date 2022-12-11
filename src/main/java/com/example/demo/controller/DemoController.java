@@ -8,19 +8,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+// @RestController definiamo scopo dela classe:
+// gestire e configurare gli end-point
+// ci permette di generare end-point richiamabili via HTTP
 public class DemoController {
 
+    // fa una mappatura di tipo Get
     @GetMapping("/prima-chiamata")
-    //RequestMapping quando la chiamata esula dai canoni standard e si vuol chiamare qualcosa di particolare
     public String demo1() {
         return "ciao da GetMapping";
     }
 
     // passagio di parametri
+    // localhost:8083/seconda-chiamata?nome=Pippo&cognome=Rossi
+    @GetMapping("/seconda-chiamata")
     // @RequestParam intercetta parametri nell'url col medesimo nome
-    @GetMapping("/seconda-chiamata")    // localhost:8083/seconda-chiamata?nome=Pippo&cognome=Rossi
-    //public String demo2(@RequestParam String nome, @RequestParam String cognome){
-    public String demo2(@RequestParam(required = true) String nome, @RequestParam(required = false) String cognome) {
+    // parametri annotati con @RequestParam sono obbligatori di default `required = true`
+    // defaultValue permette d’impostare un valore di default
+    // nota Valorizzando defaultValue, l’elemento required dell’annotazione verrà implicitamente impostato a false.
+    public String demo2(@RequestParam(required = true) String nome,
+                        @RequestParam(required = false, defaultValue = "Ciccio") String cognome) {
         return "ciao " + nome + " " + cognome;
     }
 
@@ -34,8 +41,9 @@ public class DemoController {
     // passaggio di oggetti
     @GetMapping("persona")      // localhost:8083/persona
     public Persona getPersona() {
-        Persona persona = new Persona("Dante", "Alighieri", LocalDate.of(1985, 12, 7), 164);
-        return persona; // restituisce Json // {"nome":"Dante","cognome":"Alighieri","dob":"1985-12-07","height":164}
+        Persona persona = new Persona("Dante", "Alighieri",
+                LocalDate.of(1985, 12, 7), 164);
+        return persona; // Json: {"nome":"Dante","cognome":"Alighieri","dob":"1985-12-07","height":164}
     }
 
     // passagio di Collection
@@ -44,11 +52,15 @@ public class DemoController {
     // noi metteremo le end-point
     public List<Persona> getPersone() {
         List<Persona> persone = new ArrayList();
-        Persona per1 = new Persona("Dante", "Alighieri", LocalDate.of(1985, 12, 7), 164);
-        Persona per2 = new Persona("Dantone", "Aligh", LocalDate.of(1725, 4, 2), 157);
+        Persona per1 = new Persona("Dante", "Alighieri",
+                LocalDate.of(1985, 12, 7), 164);
+        Persona per2 = new Persona("Dantone", "Aligh",
+                LocalDate.of(1725, 4, 2), 157);
         persone.add(per1);
         persone.add(per2);
-        return persone; // Json {"nome":"Dante","cognome":"Alighieri","dob":"1985-12-07","height":164}
+        return persone; /* Json
+                [ { "nome" : "Dante", "cognome" : "Alighieri", "dob" : "1985-12-07", "height" : 164 },
+                { "nome" : "Dantone", "cognome" : "Aligh", "dob" : "1725-04-02", "height" : 157 } ] */
     }
 
     // Post
@@ -56,8 +68,10 @@ public class DemoController {
     @PostMapping("persona")
     public List<Persona> addPersone(@RequestBody Persona persona) {
         List<Persona> persone = new ArrayList();
-        Persona per1 = new Persona("Dante", "Alighieri", LocalDate.of(1985, 12, 7), 164);
-        Persona per2 = new Persona("Dantone", "Aligh", LocalDate.of(1725, 4, 2), 157);
+        Persona per1 = new Persona("Dante", "Alighieri",
+                LocalDate.of(1985, 12, 7), 164);
+        Persona per2 = new Persona("Dantone", "Light",
+                LocalDate.of(1725, 4, 2), 157);
         persone.add(per1);
         persone.add(per2);
 
@@ -68,10 +82,10 @@ public class DemoController {
         // la regola vuole che non si usino i nostri ... personali
         // ma si basa su classi di appoggio, così dette di request !!!
         Persona p3 = new Persona();
-        persona.setNome(persona.getNome().toUpperCase());
-        persona.setCognome(persona.getCognome().toUpperCase());
-        persona.setDob(persona.getDob());
-        persona.setheightr(persona.getheight());
+        p3.setNome(persona.getNome().toUpperCase());
+        p3.setCognome(persona.getCognome().toUpperCase());
+        p3.setDob(persona.getDob());
+        p3.setheightr(persona.getheight());
         persone.add(p3);
 
 
@@ -84,8 +98,10 @@ public class DemoController {
     // modifichiamo un parametro della risorsa
     public List<Persona> patchPersone(@RequestParam int incrementaAltezza) {
         List<Persona> persone = new ArrayList();
-        Persona per1 = new Persona("Dante", "Alighieri", LocalDate.of(1985, 12, 7), 164);
-        Persona per2 = new Persona("Dantone", "Aligh", LocalDate.of(1725, 4, 2), 157);
+        Persona per1 = new Persona("Dante", "Alighieri",
+                LocalDate.of(1985, 12, 7), 164);
+        Persona per2 = new Persona("Dantone", "Aligh",
+                LocalDate.of(1725, 4, 2), 157);
         persone.add(per1);
         persone.add(per2);
 
@@ -98,13 +114,18 @@ public class DemoController {
     }
 
     //@DeleteMapping
-
     // delite non si fa quasi mai..
     // per le tabelle referenziate all'oggetto di cancellazione
 
     /*
-    // dobbiamo definire il metodo che useremo, cosa produce (cio che arriva in input, cosa consuma
-    // va ilmime tipe
+    @RequestMapping quando la chiamata esula dai canoni standard e si vuol chiamare qualcosa di particolare
+    , cosa consuma
+    - Sintassi diversa, bisogna specificare manualmente:
+      definire il metodo che useremo (Get/Post/..), in @GetMapping è già definito nel nome
+      la uri (es. "/chiamata")
+      cosa produce (ciò che arriva in input: il tipo di dato che si aspetta)
+      cosa consuma (il tipo di dato che produce)
+      // va ilmime tipe
     @RequestMapping(method = RequestMethod.GET, value ="/chiamata", consumes="text/html", produces = "text/html")
     public String demo2(){
         return "ciao da RequestMapping";

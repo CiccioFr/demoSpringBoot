@@ -6,6 +6,7 @@ public class Persona {
     private String nome;
     private String cognome;
     // le nuove classi per le date
+    // Le Java API Time: LocalDate | LocalDateTime
     private LocalDate dob; // dob = date of birthDay
     private int height;
 
